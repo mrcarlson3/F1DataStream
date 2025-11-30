@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+env/
+venv/
+
+
+# FastF1 cache (large files)
+fastf1_cache/
+
+# DuckDB database
+data/f1.duckdb
+data/f1.duckdb.wal
+*.duckdb
+*.duckdb.wal
+
+# Logs
+data/logs/*.log
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prefect
+.prefect/
+
+# Data files (keep directory structure)
+data/figures/*.png
+!data/figures/.gitkeep

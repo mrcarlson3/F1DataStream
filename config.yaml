@@ -1,0 +1,38 @@
+# F1 Data Pipeline Configuration
+
+seasons: [2019, 2020, 2021, 2022, 2023]  # Seasons to include
+session_type: "R"  # Race sessions only
+
+# Paths
+cache_dir: "./fastf1_cache"
+db_path: "./data/f1.duckdb"
+log_dir: "./data/logs"
+figures_dir: "./data/figures"
+
+# Teams of interest (Top 6 constructors)
+teams_of_interest:
+  - "Mercedes"
+  - "Red Bull Racing"
+  - "Ferrari"
+  - "McLaren"
+  - "Alpine"
+  - "Aston Martin"
+
+# Team name mapping for consistency across seasons
+team_mapping:
+  "Red Bull": "Red Bull Racing"
+  "Aston Martin F1 Team": "Aston Martin"
+  "Alpine F1 Team": "Alpine"
+  "McLaren F1 Team": "McLaren"
+  "Scuderia Ferrari": "Ferrari"
+  "Mercedes-AMG Petronas F1 Team": "Mercedes"
+
+# Data quality thresholds
+max_lap_time_seconds: 200  # Filter out extreme outliers
+min_lap_time_seconds: 60   # Filter out invalid times
+
+# Prefect settings
+prefect:
+  max_retries: 3
+  retry_delay_seconds: 1
+  flow_run_name: "f1-data-pipeline-{date}"

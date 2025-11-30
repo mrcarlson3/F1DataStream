@@ -1,6 +1,9 @@
 # F1 Data Pipeline Configuration
 
-seasons: [2019, 2020, 2021, 2022, 2023]  # Seasons to include
+# NOTE: Using 2019-2020 as these have 100% data availability (38/38 races)
+# 2021+ has known gaps due to FastF1 server issues during those race weekends
+# Per FastF1 docs: data available 30-120 min after session, but historical gaps exist
+seasons: [2019, 2020, 2021, 2022, 2023]  # Seasons with complete data coverage
 session_type: "R"  # Race sessions only
 
 # Paths

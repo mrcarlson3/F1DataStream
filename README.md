@@ -48,7 +48,7 @@ All figures are saved to `data/figures/` as high-resolution PNG files.
 - **Flows**: The main `f1_data_pipeline()` is a `@flow` that orchestrates all tasks
 - **Logging**: Automatic logging to track progress and debug failures
 - **Retry logic**: Built-in retry mechanisms for API failures
-- **Remote tracking**: Connects to `sds-prefect.pods.uvarc.io` to track runs (local execution)
+
 
 ### DuckDB (Analytical Database)
 - **Columnar storage**: Optimized for analytical queries on large datasets

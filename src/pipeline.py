@@ -51,7 +51,7 @@ def setup_environment(config: Dict) -> None:
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Recommended way from docs: enable cache once at startup
-    # fastf1.Cache.enable_cache('path/to/cache') ([docs.fastf1.dev](https://docs.fastf1.dev/fastf1.html?utm_source=openai))
+    # fastf1.Cache.enable_cache('path/to/cache') 
     fastf1.Cache.enable_cache(str(cache_dir))
     logger.info(f"FastF1 cache enabled at: {cache_dir}")
 
@@ -76,10 +76,10 @@ def load_session(
     Load a single race session using the patterns documented for FastF1 3.6.1.
 
     - Uses `fastf1.get_session(year, gp, identifier)` where
-      `gp` = round number (int) and `identifier` = 'R' (race). ([docs.fastf1.dev](https://docs.fastf1.dev/_modules/fastf1/events.html?utm_source=openai))
+      `gp` = round number (int) and `identifier` = 'R' (race). 
     - Calls `Session.load(laps=True, telemetry=False, weather=False, messages=True)`.
       (laps=True so `.laps` is available; messages=True so race control-based
-       lap corrections and results calculations work correctly.) ([docs.fastf1.dev](https://docs.fastf1.dev/_modules/fastf1/core.html))
+       lap corrections and results calculations work correctly.) 
     - Handles:
         * `DataNotLoadedError` / `NoLapDataError` → session has no usable timing/results
         * `RateLimitExceededError` → backoff and retry
@@ -213,7 +213,6 @@ def ingest_season(year: int) -> Dict:
         rnd = int(ev["RoundNumber"])
         name = ev["EventName"]
 
-        # Spacing calls to reduce pressure on API. ([docs.fastf1.dev](https://docs.fastf1.dev/_modules/fastf1/req.html?utm_source=openai))
         time.sleep(2.0)
 
         session_data = load_session(year, rnd, name)

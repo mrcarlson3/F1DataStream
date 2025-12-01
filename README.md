@@ -1,73 +1,63 @@
-# F1 Data Pipeline: Race Pace & Strategy Analysis (2019-2024)
+# F1 Data Pipeline
 
-A comprehensive data engineering and analysis project using **FastF1** to analyze Formula 1 race performance, tyre strategy, and degradation patterns across 6 seasons (2019-2024). Built with **Prefect** orchestration, **DuckDB** storage, and production-grade error handling.
+A data engineering project that analyzes Formula 1 race performance using the FastF1 API. The pipeline ingests, cleans, and analyzes lap timing data to understand team pace evolution, tyre strategy patterns, and race performance trends.
 
+The data comes from the **FastF1** library, which provides access to official Formula 1 timing data including:
 
+- **Lap times**: Every lap completed by every driver in every race
+- **Tyre compounds**: Which tyre type (Soft, Medium, Hard) was used
+- **Pit stops**: When drivers stopped and how long they stayed
+- **Race results**: Final positions, points, and DNFs
+- **Driver/Team info**: Names, numbers, and team affiliations
 
+This data covers the **2019-2023 seasons** 
 
+## Pipeline Architecture
 
-### Database Schema
+### `pipeline.py` - ETL Pipeline
 
-```sql
--- Raw tables
-raw_laps          -- All lap records from FastF1
-raw_results       -- Race results from FastF1
+The main data pipeline that handles three stages:
 
--- Dimension tables
-dim_driver        -- Driver reference
-dim_team          -- Team reference (normalized names)
+**Stage 1: Ingestion**
+- Fetches race data from FastF1 API for all configured seasons
+- Loads lap timing and race results for each Grand Prix
+- Implements retry logic with exponential backoff for API failures
+- Stores raw data in DuckDB tables: `raw_laps` and `raw_results`
 
--- Clean tables
-clean_laps        -- Validated laps with time conversions
-clean_results     -- Standardized race results
+**Stage 2: Cleaning**
+- Converts lap times from timedelta objects to seconds (float)
+- Flags pit laps and filters outliers (>200s lap times)
+- Normalizes team names across seasons (e.g., "Red Bull" → "Red Bull Racing")
+- Creates dimension tables for drivers and teams
+- Produces: `clean_laps`, `clean_results`, `dim_driver`, `dim_team`
 
--- Analytical features
-stint_metrics           -- Stint-level degradation slopes
-driver_race_metrics     -- Driver pace, pit timing, compound usage
-team_race_metrics       -- Team pace delta, strategy patterns
-```
+**Stage 3: Feature Engineering**
+- **Stint metrics**: Calculates tyre degradation slopes using linear regression (seconds lost per lap)
+- **Driver metrics**: Aggregates pace statistics, pit timing, and compound usage per driver per race
+- **Team metrics**: Computes team-level pace deltas relative to fastest team, strategy patterns
+- Produces: `stint_metrics`, `driver_race_metrics`, `team_race_metrics`
 
+### `analysis.py` - Visualization & Analysis
 
-### Running the Pipeline
+All figures are saved to `data/figures/` as high-resolution PNG files.
 
-```bash
-# Run full ETL pipeline (takes 30-60 minutes)
-python src/pipeline.py
-```
+## Technology Stack
 
-This will:
-1. Fetch all race sessions from FastF1 API
-2. Store ~100k+ lap records in `data/f1.duckdb`
-3. Generate analytical features
-4. Log everything to `data/logs/pipeline_*.log`
+### Prefect (Workflow Orchestration)
+- **Tasks**: Each function (`load_session`, `clean_laps`, etc.) is a `@task` that can be monitored
+- **Flows**: The main `f1_data_pipeline()` is a `@flow` that orchestrates all tasks
+- **Logging**: Automatic logging to track progress and debug failures
+- **Retry logic**: Built-in retry mechanisms for API failures
+- **Remote tracking**: Connects to `sds-prefect.pods.uvarc.io` to track runs (local execution)
 
-**Monitor progress:** Check `data/logs/` for real-time execution logs
-
-### Running Analysis
-
-```bash
-# Generate all visualizations
-python src/analysis.py
-```
-
-Outputs (saved to `data/figures/`):
-- `pace_evolution.png` - Team pace trends across seasons
-- `strategy_patterns.png` - Pit timing and compound usage
-- `degradation_analysis.png` - Tyre wear vs results
-- `anomaly_case_study.png` - Notable race outliers
-
----
-
+### DuckDB (Analytical Database)
+- **Columnar storage**: Optimized for analytical queries on large datasets
+- **Embedded database**: No separate server needed - stored as `data/f1.duckdb`
+- **SQL interface**: Query data using standard SQL
+- **7 tables**: Raw data → cleaned data → analytical features
+- **Fast aggregations**: Compute team/driver statistics efficiently
 
 
-## 🛠️ Error Handling & Logging
-
-### Robust Error Management
-
-- **Task-level retries**: 3 attempts with exponential backoff (1s, 2s, 4s)
-- **Session failures**: Logged and skipped gracefully (no pipeline crash)
-- **Data validation**: Lap time outliers filtered (60s < time < 200s)
-- **API rate limits**: Handled by FastF1 caching layer
 
 
 

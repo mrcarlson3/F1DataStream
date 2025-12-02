@@ -1,4 +1,5 @@
 import time
+import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -30,6 +31,33 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 if not hasattr(np, "NaN"):
     np.NaN = np.nan
 
+
+def setup_logging(log_dir: str) -> None:
+    """Configure logging to append Prefect logs to a local file."""
+    log_path = Path(log_dir)
+    log_path.mkdir(parents=True, exist_ok=True)
+    log_file = log_path / "pipeline.log"
+    
+    # Configure root logger to write to file (append mode)
+    file_handler = logging.FileHandler(log_file, mode='a')
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to Prefect's logger
+    prefect_logger = logging.getLogger("prefect")
+    prefect_logger.addHandler(file_handler)
+    prefect_logger.setLevel(logging.INFO)
+    
+    # Add a run separator
+    separator = "\n" + "="*80
+    separator += f"\nPipeline Run Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    separator += "\n" + "="*80 + "\n"
+    with open(log_file, 'a') as f:
+        f.write(separator)
 
 
 # config 
@@ -410,4 +438,12 @@ def f1_data_pipeline():
 
 if __name__ == "__main__":
     print("Starting F1 Data Pipeline with Prefect...")
+    
+    # Setup logging before running pipeline
+    config_path = Path(__file__).parent.parent / "config.yaml"
+    with open(config_path, 'r') as f:
+        cfg = yaml.safe_load(f)
+    log_dir = cfg.get('log_dir', './data/logs')
+    setup_logging(log_dir)
+    
     f1_data_pipeline()

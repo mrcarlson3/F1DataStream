@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+duckdb = "==1.4.2"
+fastf1 = "==3.7.0"
+matplotlib = "==3.10.7"
+numpy = "==2.3.5"
+pandas = "==2.3.3"
+prefect = "==3.6.4"
+pyyaml = "==6.0.3"
+seaborn = "==0.13.2"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

@@ -1,1 +1,3 @@
-# This directory stores analysis outputs
+# This file keeps the 'data/figures' directory in version control.
+# Store generated figure files (e.g., .png, .svg) in this directory.
+# The file is intentionally empty otherwise.

@@ -28,5 +28,4 @@ Thumbs.db
 .prefect/
 
 # Data files (keep directory structure)
-data/figures/*.png
 !data/figures/.gitkeep
